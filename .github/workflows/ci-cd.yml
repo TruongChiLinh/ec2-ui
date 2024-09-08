@@ -59,11 +59,11 @@ jobs:
       - name: Deploy to EC2
         env:
           PRIVATE_KEY: ${{ secrets.EC2_PRIVATE_KEY }}
-          EC2_IP_ADDRESS: ${{ secrets.EC2_IP_ADDRESS }}
+          EC2_IP_ADDRESS: ${{ secrets.EC2_PRIVATE_KEY }}
         run: |
           echo "$PRIVATE_KEY" > osaka-key.pem
           chmod 400 osaka-key.pem
-          ssh -i osaka-key.pem -o StrictHostKeyChecking=no ubuntu@EC2_IP_ADDRESS 'bash -s' << 'EOF'
+          ssh -i osaka-key.pem -o StrictHostKeyChecking=no ubuntu@EC2_PRIVATE_KEY 'bash -s' << 'EOF'
             docker pull jaytruong/image-be:latest
             docker stop container_name || true
             docker rm container_name || true
