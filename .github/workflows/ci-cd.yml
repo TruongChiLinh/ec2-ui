@@ -54,7 +54,7 @@ jobs:
 
   deploy:
       runs-on: ubuntu-latest
-      needs: build_and_push_image
+      needs: pull_image
       steps:
         - name: Deploy to EC2
           env:
