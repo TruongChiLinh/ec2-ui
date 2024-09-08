@@ -59,6 +59,7 @@ jobs:
       - name: Deploy to EC2
         env:
           PRIVATE_KEY: ${{ secrets.EC2_PRIVATE_KEY }}
+          EC2_IP_ADDRESS: ${{ secrets.EC2_IP_ADDRESS }}
         run: |
           echo "$PRIVATE_KEY" > osaka-key.pem
           chmod 400 osaka-key.pem
