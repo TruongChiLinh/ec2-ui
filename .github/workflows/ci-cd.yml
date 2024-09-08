@@ -52,3 +52,20 @@ jobs:
           echo "Pulling image with tag: latest"
           docker pull ${{ secrets.DOCKER_USERNAME }}/image-fe:latest
 
+  deploy:
+      runs-on: ubuntu-latest
+      needs: build-and-push
+
+      steps:
+        - name: Deploy to EC2
+          env:
+            PRIVATE_KEY: ${{ secrets.EC2_PRIVATE_KEY }}
+          run: |
+            echo "$PRIVATE_KEY" > osaka-key.pem
+            chmod 400 osaka-key.pem
+            ssh -i osaka-key.pem -o StrictHostKeyChecking=no ubuntu@<EC2_IP_ADDRESS> << 'EOF'
+              docker pull jaytruong/image-be:latest
+              docker stop container_name || true
+              docker rm container_name || true
+              docker run -d --name container_name -p 80:80 jaytruong/image-be:latest
+            EOF
