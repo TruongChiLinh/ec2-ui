@@ -53,9 +53,11 @@ jobs:
           docker pull ${{ secrets.DOCKER_USERNAME }}/image-fe:latest
 
   deploy:
-      runs-on: ubuntu-latest
-      needs: pull_image
-      steps:
+    runs-on: ubuntu-latest
+    needs: pull_image
+    steps:
+      - name: Print IP Address
+        run: echo "EC2_IP_ADDRESS=${{ secrets.EC2_IP_ADDRESS }}"
       - name: Deploy to EC2
         env:
           PRIVATE_KEY: ${{ secrets.EC2_PRIVATE_KEY }}
@@ -63,10 +65,12 @@ jobs:
         run: |
           echo "$PRIVATE_KEY" > osaka-key.pem
           chmod 400 osaka-key.pem
-          ssh -i osaka-key.pem -o StrictHostKeyChecking=no ec2-user@@EC2_IP_ADDRESS 'bash -s' << 'EOF'
+          echo "Connecting to $EC2_IP_ADDRESS"
+          ssh -i osaka-key.pem -o StrictHostKeyChecking=no ec2-user@$EC2_IP_ADDRESS 'bash -s' << 'EOF'
             docker pull jaytruong/image-be:latest
             docker stop container_name || true
             docker rm container_name || true
             docker run -d --name container_name -p 80:80 jaytruong/image-be:latest
           EOF
+
 
