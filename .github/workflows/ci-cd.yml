@@ -63,10 +63,12 @@ jobs:
           PRIVATE_KEY: ${{ secrets.EC2_PRIVATE_KEY }}
           EC2_IP_ADDRESS: ${{ secrets.EC2_IP_ADDRESS }}
         run: |
+          # Lưu khóa PEM vào file và đặt quyền
           echo "$PRIVATE_KEY" > osaka-key.pem
           chmod 400 osaka-key.pem
-          echo "Connecting to $EC2_IP_ADDRESS"
-          ssh -i osaka-key.pem -o StrictHostKeyChecking=no ec2-user@$EC2_IP_ADDRESS 'bash -s' << 'EOF'
+
+          # Kết nối đến EC2 và thực hiện các lệnh Docker
+          ssh -i osaka-key.pem -o StrictHostKeyChecking=no ec2-user@$EC2_IP_ADDRESS << 'EOF'
             docker pull jaytruong/image-be:latest
             docker stop container_name || true
             docker rm container_name || true
