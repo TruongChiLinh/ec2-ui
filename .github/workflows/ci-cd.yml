@@ -54,25 +54,18 @@ jobs:
 
   deploy:
     runs-on: ubuntu-latest
-    needs: pull_image
-    steps:
-      - name: Print IP Address
-        run: echo "EC2_IP_ADDRESS=${{ secrets.EC2_IP_ADDRESS }}"
-      - name: Deploy to EC2
-        env:
-          PRIVATE_KEY: ${{ secrets.EC2_PRIVATE_KEY }}
-          EC2_IP_ADDRESS: ${{ secrets.EC2_IP_ADDRESS }}
-        run: |
-          # Lưu khóa PEM vào file và đặt quyền
-          echo "$PRIVATE_KEY" > osaka-key.pem
-          chmod 400 osaka-key.pem
 
-          # Kết nối đến EC2 và thực hiện các lệnh Docker
-          ssh -i osaka-key.pem -o StrictHostKeyChecking=no ec2-user@$EC2_IP_ADDRESS << 'EOF'
-            docker pull jaytruong/image-be:latest
-            docker stop container_name || true
-            docker rm container_name || true
-            docker run -d --name container_name -p 80:80 jaytruong/image-be:latest
-          EOF
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+
+    - name: Add SSH key
+      run: |
+        echo "$EC2_IP_ADDRESS" > osaka-key.pem
+        chmod 600 osaka-key.pem
+
+    - name: SSH into EC2 and check Docker version
+      run: |
+        ssh -i ec2-key.pem -o StrictHostKeyChecking=no ec2-user@${{ secrets.EC2_IP_ADDRESS }} "docker --version"
 
 
