@@ -62,7 +62,7 @@ jobs:
     - name: Add SSH key
       run: |
         echo "$EC2_PRIVATE_KEY" > osaka-key.pem
-        chmod 600 osaka-key.pem
+        chmod 400 osaka-key.pem
 
     - name: SSH into EC2 and check Docker version
       run: |
